@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
   initMap(); // added 
   fetchNeighborhoods();
   fetchCuisines();
+  initServiceWorker();
 });
 
 /**
@@ -78,7 +79,7 @@ initMap = () => {
         scrollWheelZoom: false
       });
   L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.jpg70?access_token={mapboxToken}', {
-    mapboxToken: '<your MAPBOX API KEY HERE>',
+    mapboxToken: 'pk.eyJ1Ijoic3BhZ2hldHRpZGF2ZTgwIiwiYSI6ImNqbDZ0NGNhbTBodGMza3J2OTQyZXA0NW0ifQ.XeDYg4jqgxy5FnPnFGwXHw',
     maxZoom: 18,
     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
       '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
@@ -161,6 +162,7 @@ createRestaurantHTML = (restaurant) => {
   const image = document.createElement('img');
   image.className = 'restaurant-img';
   image.src = DBHelper.imageUrlForRestaurant(restaurant);
+  image.alt = restaurant.imageAlt;
   li.append(image);
 
   const name = document.createElement('h1');
@@ -209,3 +211,14 @@ addMarkersToMap = (restaurants = self.restaurants) => {
   });
 } */
 
+/*
+* Service Worker
+*/
+initServiceWorker = () => {
+  if (!navigator.serviceWorker) return;
+  navigator.serviceWorker.register('./js/sw/sw.js').then(function() {
+    console.log('The service worker has been registered.');
+  }).catch(function() {
+    console.log('Service worker failed!!!');
+  });
+}
