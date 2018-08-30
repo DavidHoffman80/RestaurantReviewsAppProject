@@ -216,8 +216,37 @@ addMarkersToMap = (restaurants = self.restaurants) => {
 */
 initServiceWorker = () => {
   if (!navigator.serviceWorker) return;
-  navigator.serviceWorker.register('./js/sw/sw.js').then(function() {
+  navigator.serviceWorker.register('/sw.js').then(function(reg) {
     console.log('The service worker has been registered.');
+
+    if(!navigator.serviceWorker.controller) {
+      return;
+    }
+
+    if(reg.installing) {
+      navigator.serviceWorker.addEventListener('statechange', function() {
+        if(navigator.serviceWorker.controller.state == 'installed') {
+          navigator.serviceWorker.controller.postMessage({ action: 'skipWaiting' });
+        }
+      });
+    }
+
+    if(reg.waiting) {
+      navigator.serviceWorker.controller.postMessage({ action: 'skipWaiting' });
+    }
+
+    reg.addEventListener('updatefound', function() {
+      navigator.serviceWorker.addEventListener('statechange', function() {
+        if(navigator.serviceWorker.controller.state == 'installed') {
+          navigator.serviceWorker.controller.postMessage({ action: 'skipWaiting' });
+        }
+      });
+    });
+
+    navigator.serviceWorker.addEventListener('controllerchange', function() {
+      window.location.reload();
+    });
+
   }).catch(function() {
     console.log('Service worker failed!!!');
   });
